@@ -17,6 +17,7 @@
 		B0474AA31D429F0700C277A1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B0474AA11D429F0700C277A1 /* LaunchScreen.storyboard */; };
 		B0474AAE1D429F0700C277A1 /* SwiftMIDIThruTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0474AAD1D429F0700C277A1 /* SwiftMIDIThruTests.swift */; };
 		B0474AB91D429F4500C277A1 /* MIDIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0474AB81D429F4500C277A1 /* MIDIManager.swift */; };
+		B0474ABB1D42B4BF00C277A1 /* momo.png in Resources */ = {isa = PBXBuildFile; fileRef = B0474ABA1D42B4BF00C277A1 /* momo.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		B0474AAD1D429F0700C277A1 /* SwiftMIDIThruTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftMIDIThruTests.swift; sourceTree = "<group>"; };
 		B0474AAF1D429F0700C277A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B0474AB81D429F4500C277A1 /* MIDIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIDIManager.swift; sourceTree = "<group>"; };
+		B0474ABA1D42B4BF00C277A1 /* momo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = momo.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +70,7 @@
 		B0474A831D429F0700C277A1 = {
 			isa = PBXGroup;
 			children = (
+				B0474ABA1D42B4BF00C277A1 /* momo.png */,
 				B0474A8E1D429F0700C277A1 /* SwiftMIDIThru */,
 				B0474AAC1D429F0700C277A1 /* SwiftMIDIThruTests */,
 				B0474A8D1D429F0700C277A1 /* Products */,
@@ -206,6 +209,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0474A9B1D429F0700C277A1 /* .travis.yml in Resources */,
+				B0474ABB1D42B4BF00C277A1 /* momo.png in Resources */,
 				B0474A991D429F0700C277A1 /* .gitignore in Resources */,
 				B0474A971D429F0700C277A1 /* LICENSE in Resources */,
 				B0474AA31D429F0700C277A1 /* LaunchScreen.storyboard in Resources */,
