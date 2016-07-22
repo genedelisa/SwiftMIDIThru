@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		B0474A901D429F0700C277A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0474A8F1D429F0700C277A1 /* AppDelegate.swift */; };
 		B0474A921D429F0700C277A1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0474A911D429F0700C277A1 /* ViewController.swift */; };
-		B0474A951D429F0700C277A1 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = B0474A941D429F0700C277A1 /* README.md */; };
 		B0474A971D429F0700C277A1 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = B0474A961D429F0700C277A1 /* LICENSE */; };
 		B0474A991D429F0700C277A1 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = B0474A981D429F0700C277A1 /* .gitignore */; };
 		B0474A9B1D429F0700C277A1 /* .travis.yml in Resources */ = {isa = PBXBuildFile; fileRef = B0474A9A1D429F0700C277A1 /* .travis.yml */; };
@@ -17,6 +16,7 @@
 		B0474AA01D429F0700C277A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0474A9F1D429F0700C277A1 /* Assets.xcassets */; };
 		B0474AA31D429F0700C277A1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B0474AA11D429F0700C277A1 /* LaunchScreen.storyboard */; };
 		B0474AAE1D429F0700C277A1 /* SwiftMIDIThruTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0474AAD1D429F0700C277A1 /* SwiftMIDIThruTests.swift */; };
+		B0474AB91D429F4500C277A1 /* MIDIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0474AB81D429F4500C277A1 /* MIDIManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +44,7 @@
 		B0474AA91D429F0700C277A1 /* SwiftMIDIThruTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftMIDIThruTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0474AAD1D429F0700C277A1 /* SwiftMIDIThruTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftMIDIThruTests.swift; sourceTree = "<group>"; };
 		B0474AAF1D429F0700C277A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B0474AB81D429F4500C277A1 /* MIDIManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MIDIManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +86,7 @@
 		B0474A8E1D429F0700C277A1 /* SwiftMIDIThru */ = {
 			isa = PBXGroup;
 			children = (
+				B0474AB81D429F4500C277A1 /* MIDIManager.swift */,
 				B0474A8F1D429F0700C277A1 /* AppDelegate.swift */,
 				B0474A911D429F0700C277A1 /* ViewController.swift */,
 				B0474A9C1D429F0700C277A1 /* Main.storyboard */,
@@ -226,8 +228,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B0474A951D429F0700C277A1 /* README.md in Sources */,
 				B0474A921D429F0700C277A1 /* ViewController.swift in Sources */,
+				B0474AB91D429F4500C277A1 /* MIDIManager.swift in Sources */,
 				B0474A901D429F0700C277A1 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -5,10 +5,16 @@
 [![Build Status](https://travis-ci.org/genedelisa/SwiftMIDIThru.svg)](https://travis-ci.org/genedelisa/SwiftMIDIThru)
 [![GitHub tag](https://img.shields.io/github/tag/genedelisa/SwiftMIDIThru.svg)](https://github.com/genedelisa/SwiftMIDIThru/)
 [![GitHub release](https://img.shields.io/github/release/genedelisa/SwiftMIDIThru.svg)](https://github.com/genedelisa/SwiftMIDIThru/)
-[![Swift 2](https://img.shields.io/badge/swift2-compatible-4BC51D.svg?style=flat")](https://developer.apple.com/swift)
+[![GitHub commits](https://img.shields.io/github/commits-since/genedelisa/SwiftMIDIThru/1.0.0.svg)
+[![Swift 3](https://img.shields.io/badge/swift3-compatible-4BC51D.svg?style=flat")](https://developer.apple.com/swift)
+
+[![Platforms OS X | iOS](https://img.shields.io/badge/Platforms-OS%20X%20%7C%20iOS-lightgray.svg?style=flat)](https://swift.org/)
+
+[![Sponsors](https://img.shields.io/badge/Sponsors-Rockhopper%20Technologies-orange.svg?style=flat)](http://www.rockhoppertech.com/)
+[![Twitter @GeneDeLisaDev](https://img.shields.io/twitter/follow/GeneDeLisaDev.svg?style=social)](https://twitter.com/GeneDeLisaDev)
 
 
-An example using
+An example using MIDI Thru in Swift.
 
 
 ## Blog post for this example.

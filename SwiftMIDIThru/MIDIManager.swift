@@ -1,8 +1,8 @@
 //
 //  MIDIManager.swift
-//  Swift2MIDIThru
+//  SwiftMIDIThru
 //
-//  Created by Gene De Lisa on 6/9/15.
+//  Created by Gene De Lisa on 7/22/16.
 //  Copyright © 2015 Gene De Lisa. All rights reserved.
 //
 
@@ -13,7 +13,6 @@ import AudioToolbox
 
 /// The `Singleton` instance
 private let MIDIManagerInstance = MIDIManager()
-
 
 
 /**
@@ -42,9 +41,9 @@ class MIDIManager : NSObject {
     
     var musicPlayer:MusicPlayer?
     
-    var processingGraph:AUGraph! = nil
+    var processingGraph:AUGraph?
     
-    var samplerUnit:AudioUnit! = nil
+    var samplerUnit:AudioUnit?
     
     /*
      func createThrus(source:MIDIEndpointRef?, dest:[MIDIEndpointRef]?) {
@@ -141,7 +140,7 @@ class MIDIManager : NSObject {
         //        params.velocity = MIDITransform(transform:MIDITransformType(kMIDITransform_MapValue), param:0)
         //        params.numMaps = 1
         
-        params.noteNumber = MIDITransform(transform:.Add, param:24)
+        params.noteNumber = MIDITransform(transform:.add, param:24)
         
         print("setting params \(params)")
         
@@ -158,9 +157,16 @@ class MIDIManager : NSObject {
             CheckError(status)
         }
         
-        var data:Unmanaged<CFData>!
-        status = MIDIThruConnectionGetParams(self.midiThru,  &data)
+        /*
+        let buf = [UInt8]()
+        var cfd = CFDataCreate(kCFAllocatorDefault,  buf,  1)!
+        var data:Unmanaged<CFData> = &cfd
+        status = MIDIThruConnectionGetParams(self.midiThru,  &cfd)
         CheckError(status)
+//        let pd = data.takeUnretainedValue()
+//        print("retrieved params \(pd)")
+
+  
         if let d = data {
             //            let pd = d.takeUnretainedValue() as! MIDIThruConnectionParams
             let pd = d.takeUnretainedValue()
@@ -170,6 +176,7 @@ class MIDIManager : NSObject {
             
             print("retrieved params \(pd)")
         }
+*/
         
         return self.midiThru
     }
@@ -204,7 +211,7 @@ class MIDIManager : NSObject {
         params.filterOutTuneRequest = 1
         
         // try a transform - add 24 o noteNumbers
-        params.noteNumber = MIDITransform(transform:.Add, param:24)
+        params.noteNumber = MIDITransform(transform:.add, param:24)
         
         // Srsly?
         let nsdata = withUnsafePointer(&params) { p in
@@ -362,7 +369,8 @@ class MIDIManager : NSObject {
             connectSourcesToInputPort()
             
             // createThru(inputPort, dest: destEndpointRef)
-            createThru(destEndpointRef, dest: destEndpointRef)
+            let thruConnection = createThru(source: destEndpointRef, dest: destEndpointRef)
+            print("\(thruConnection)")
             
             //            createThru(inputPort, dest: outputPort)
             
@@ -390,30 +398,34 @@ class MIDIManager : NSObject {
         graphStart()
         // after the graph starts
         loadSF2Preset(0)
-        CAShow(UnsafeMutablePointer<MusicSequence>(self.processingGraph))
+        CAShow(UnsafeMutablePointer<MusicSequence>(self.processingGraph!))
     }
     
     
+    // swift 2
     // typealias MIDIReadBlock = (UnsafePointer<MIDIPacketList>, UnsafeMutablePointer<Void>) -> Void
+    // swift 3
+    // typealias MIDIReadBlock = (UnsafePointer<MIDIPacketList>, UnsafeMutablePointer<Swift.Void>?) -> Swift.Void
+
     
-    func MyMIDIReadBlock(packetList: UnsafePointer<MIDIPacketList>, srcConnRefCon: UnsafeMutablePointer<Void>) -> Void {
+    func MyMIDIReadBlock(packetList: UnsafePointer<MIDIPacketList>, srcConnRefCon: UnsafeMutablePointer<Swift.Void>?) -> Swift.Void {
         
         //debugPrint("MyMIDIReadBlock \(packetList)")
         
         
-        let packets = packetList.memory
+        let packets = packetList.pointee
         
         let packet:MIDIPacket = packets.packet
         
         // don't do this
         //        print("packet \(packet)")
         
-        var ap = UnsafeMutablePointer<MIDIPacket>.alloc(1)
-        ap.initialize(packet)
+        var ap = UnsafeMutablePointer<MIDIPacket>.init(allocatingCapacity: 1)
+        ap.initialize(with:packet)
         
         for _ in 0 ..< packets.numPackets {
             
-            let p = ap.memory
+            let p = ap.pointee
             print("timestamp \(p.timeStamp)", terminator: "")
             var hex = String(format:"0x%X", p.data.0)
             print(" \(hex)", terminator: "")
@@ -430,7 +442,7 @@ class MIDIManager : NSObject {
         
     }
     
-    func handle(packet:MIDIPacket) {
+    func handle(_ packet:MIDIPacket) {
         
         let status = packet.data.0
         let d1 = packet.data.1
@@ -470,33 +482,33 @@ class MIDIManager : NSObject {
     }
     
     
-    func showMIDIObjectType(ot: MIDIObjectType) {
+    func showMIDIObjectType(_ ot: MIDIObjectType) {
         switch ot {
-        case .Other:
+        case .other:
             print("midiObjectType: Other")
             break
-        case .Device:
+        case .device:
             print("midiObjectType: Device")
             break
-        case .Entity:
+        case .entity:
             print("midiObjectType: Entity")
             break
-        case .Source:
+        case .source:
             print("midiObjectType: Source")
             break
-        case .Destination:
+        case .destination:
             print("midiObjectType: Destination")
             break
-        case .ExternalDevice:
+        case .externalDevice:
             print("midiObjectType: ExternalDevice")
             break
-        case .ExternalEntity:
+        case .externalEntity:
             print("midiObjectType: ExternalEntity")
             break
-        case .ExternalSource:
+        case .externalSource:
             print("midiObjectType: ExternalSource")
             break
-        case .ExternalDestination:
+        case .externalDestination:
             print("midiObjectType: ExternalDestination")
             break
         }
@@ -507,17 +519,17 @@ class MIDIManager : NSObject {
     func MyMIDINotifyBlock(midiNotification: UnsafePointer<MIDINotification>) {
         print("\ngot a MIDINotification!")
         
-        let notification = midiNotification.memory
+        let notification = midiNotification.pointee
         print("MIDI Notify, messageId= \(notification.messageID)")
         print("MIDI Notify, messageSize= \(notification.messageSize)")
         
         switch notification.messageID {
         
         // Some aspect of the current MIDISetup has changed.  No data.  Should ignore this  message if messages 2-6 are handled.
-        case .MsgSetupChanged:
+        case .msgSetupChanged:
             print("MIDI setup changed")
             let ptr = UnsafeMutablePointer<MIDINotification>(midiNotification)
-            let m = ptr.memory
+            let m = ptr.pointee
             print(m)
             print("id \(m.messageID)")
             print("size \(m.messageSize)")
@@ -525,11 +537,11 @@ class MIDIManager : NSObject {
             
             
         // A device, entity or endpoint was added. Structure is MIDIObjectAddRemoveNotification.
-        case .MsgObjectAdded:
+        case .msgObjectAdded:
             
             print("added")
             let ptr = UnsafeMutablePointer<MIDIObjectAddRemoveNotification>(midiNotification)
-            let m = ptr.memory
+            let m = ptr.pointee
             print(m)
             print("id \(m.messageID)")
             print("size \(m.messageSize)")
@@ -543,10 +555,10 @@ class MIDIManager : NSObject {
             break
             
         // A device, entity or endpoint was removed. Structure is MIDIObjectAddRemoveNotification.
-        case .MsgObjectRemoved:
+        case .msgObjectRemoved:
             print("kMIDIMsgObjectRemoved")
             let ptr = UnsafeMutablePointer<MIDIObjectAddRemoveNotification>(midiNotification)
-            let m = ptr.memory
+            let m = ptr.pointee
             print(m)
             print("id \(m.messageID)")
             print("size \(m.messageSize)")
@@ -558,11 +570,11 @@ class MIDIManager : NSObject {
             break
             
         // An object's property was changed. Structure is MIDIObjectPropertyChangeNotification.
-        case .MsgPropertyChanged:
+        case .msgPropertyChanged:
             print("kMIDIMsgPropertyChanged")
             
             let ptr = UnsafeMutablePointer<MIDIObjectPropertyChangeNotification>(midiNotification)
-            let m = ptr.memory
+            let m = ptr.pointee
             print(m)
             print("id \(m.messageID)")
             print("size \(m.messageSize)")
@@ -578,20 +590,20 @@ class MIDIManager : NSObject {
             break
             
         // 	A persistent MIDI Thru connection wasor destroyed.  No data.
-        case .MsgThruConnectionsChanged:
+        case .msgThruConnectionsChanged:
             print("MIDI thru connections changed.")
             break
             
         //A persistent MIDI Thru connection was created or destroyed.  No data.
-        case .MsgSerialPortOwnerChanged:
+        case .msgSerialPortOwnerChanged:
             print("MIDI serial port owner changed.")
             break
             
-        case .MsgIOError:
+        case .msgIOError:
             print("MIDI I/O error.")
             
             let ptr = UnsafeMutablePointer<MIDIIOErrorNotification>(midiNotification)
-            let m = ptr.memory
+            let m = ptr.pointee
             print(m)
             print("id \(m.messageID)")
             print("size \(m.messageSize)")
@@ -664,10 +676,10 @@ class MIDIManager : NSObject {
     
     
     func enableNetwork() {
-        let session = MIDINetworkSession.defaultSession()
-        session.enabled = true
-        session.connectionPolicy = .Anyone
-        print("net session enabled \(MIDINetworkSession.defaultSession().enabled)")
+        let session = MIDINetworkSession.default()
+        session.isEnabled = true
+        session.connectionPolicy = .anyone
+        print("net session enabled \(MIDINetworkSession.default().isEnabled)")
     }
     
     func connectSourcesToInputPort() {
@@ -732,8 +744,8 @@ class MIDIManager : NSObject {
         playMusicPlayer()
     }
     
-    func createMusicPlayer(musicSequence:MusicSequence) -> MusicPlayer {
-        var musicPlayer: MusicPlayer = nil
+    func createMusicPlayer(_ musicSequence:MusicSequence) -> MusicPlayer {
+        var musicPlayer: MusicPlayer?
         var status = noErr
         
         status = NewMusicPlayer(&musicPlayer)
@@ -741,12 +753,12 @@ class MIDIManager : NSObject {
             print("bad status \(status) creating player")
         }
         
-        status = MusicPlayerSetSequence(musicPlayer, musicSequence)
+        status = MusicPlayerSetSequence(musicPlayer!, musicSequence)
         if status != noErr {
             print("setting sequence \(status)")
         }
         
-        status = MusicPlayerPreroll(musicPlayer)
+        status = MusicPlayerPreroll(musicPlayer!)
         if status != noErr {
             print("prerolling player \(status)")
         }
@@ -758,20 +770,19 @@ class MIDIManager : NSObject {
             print("error setting sequence endpoint \(status)")
         }
         
-        return musicPlayer
+        return musicPlayer!
     }
     
     func playMusicPlayer() {
         var status = noErr
         var playing = DarwinBoolean(false)
         
-        
         if let player = self.musicPlayer {
             status = MusicPlayerIsPlaying(player, &playing)
             if playing != false {
                 print("music player is playing. stopping")
                 status = MusicPlayerStop(player)
-                if status != OSStatus(noErr) {
+                if status != noErr {
                     print("Error stopping \(status)")
                     return
                 }
@@ -780,13 +791,13 @@ class MIDIManager : NSObject {
             }
             
             status = MusicPlayerSetTime(player, 0)
-            if status != OSStatus(noErr) {
+            if status != noErr {
                 print("setting time \(status)")
                 return
             }
             
             status = MusicPlayerStart(player)
-            if status != OSStatus(noErr) {
+            if status != noErr {
                 print("Error starting \(status)")
                 return
             }
@@ -796,39 +807,39 @@ class MIDIManager : NSObject {
     
     func createMusicSequence() -> MusicSequence {
         
-        var musicSequence:MusicSequence = nil
+        var musicSequence:MusicSequence?
         var status = NewMusicSequence(&musicSequence)
-        if status != OSStatus(noErr) {
+        if status != noErr {
             print("\(#line) bad status \(status) creating sequence")
             CheckError(status)
         }
         
         // add a track
-        var track: MusicTrack = nil
-        status = MusicSequenceNewTrack(musicSequence, &track)
-        if status != OSStatus(noErr) {
+        var track: MusicTrack?
+        status = MusicSequenceNewTrack(musicSequence!, &track)
+        if status != noErr {
             print("error creating track \(status)")
             CheckError(status)
         }
         
         // bank select msb
         var chanmess = MIDIChannelMessage(status: 0xB0, data1: 0, data2: 0, reserved: 0)
-        status = MusicTrackNewMIDIChannelEvent(track, 0, &chanmess)
-        if status != OSStatus(noErr) {
+        status = MusicTrackNewMIDIChannelEvent(track!, 0, &chanmess)
+        if status != noErr {
             print("creating bank select event \(status)")
             CheckError(status)
         }
         // bank select lsb
         chanmess = MIDIChannelMessage(status: 0xB0, data1: 32, data2: 0, reserved: 0)
-        status = MusicTrackNewMIDIChannelEvent(track, 0, &chanmess)
-        if status != OSStatus(noErr) {
+        status = MusicTrackNewMIDIChannelEvent(track!, 0, &chanmess)
+        if status != noErr {
             print("creating bank select event \(status)")
             CheckError(status)
         }
         
         // program change. first data byte is the patch, the second data byte is unused for program change messages.
         chanmess = MIDIChannelMessage(status: 0xC0, data1: 0, data2: 0, reserved: 0)
-        status = MusicTrackNewMIDIChannelEvent(track, 0, &chanmess)
+        status = MusicTrackNewMIDIChannelEvent(track!, 0, &chanmess)
         if status != noErr {
             print("creating program change event \(status)")
             CheckError(status)
@@ -842,7 +853,7 @@ class MIDIManager : NSObject {
                                        velocity: 64,
                                        releaseVelocity: 0,
                                        duration: 1.0 )
-            status = MusicTrackNewMIDINoteEvent(track, beat, &mess)
+            status = MusicTrackNewMIDINoteEvent(track!, beat, &mess)
             if status != noErr {
                 print("creating new midi note event \(status)")
                 CheckError(status)
@@ -851,21 +862,21 @@ class MIDIManager : NSObject {
         }
         
         // associate the AUGraph with the sequence.
-        status = MusicSequenceSetAUGraph(musicSequence, self.processingGraph)
+        status = MusicSequenceSetAUGraph(musicSequence!, self.processingGraph)
         CheckError(status)
         
-        status = MusicSequenceSetMIDIEndpoint(musicSequence, self.midiThru)
+        status = MusicSequenceSetMIDIEndpoint(musicSequence!, self.midiThru)
         CheckError(status)
         
         // Let's see it
-        CAShow(UnsafeMutablePointer<MusicSequence>(musicSequence))
+        CAShow(UnsafeMutablePointer<MusicSequence>(musicSequence!))
         
-        return musicSequence
+        return musicSequence!
     }
     
     func augraphSetup() {
-        var status = noErr
-        status = NewAUGraph(&self.processingGraph)
+
+        var status = NewAUGraph(&self.processingGraph)
         CheckError(status)
         
         // create the sampler
@@ -879,7 +890,7 @@ class MIDIManager : NSObject {
             componentManufacturer: OSType(kAudioUnitManufacturer_Apple),
             componentFlags: 0,
             componentFlagsMask: 0)
-        status = AUGraphAddNode(self.processingGraph, &cd, &samplerNode)
+        status = AUGraphAddNode(self.processingGraph!, &cd, &samplerNode)
         CheckError(status)
         
         // create the ionode
@@ -890,23 +901,23 @@ class MIDIManager : NSObject {
             componentManufacturer: OSType(kAudioUnitManufacturer_Apple),
             componentFlags: 0,
             componentFlagsMask: 0)
-        status = AUGraphAddNode(self.processingGraph, &ioUnitDescription, &ioNode)
+        status = AUGraphAddNode(self.processingGraph!, &ioUnitDescription, &ioNode)
         CheckError(status)
         
         // now do the wiring. The graph needs to be open before you call AUGraphNodeInfo
-        status = AUGraphOpen(self.processingGraph)
+        status = AUGraphOpen(self.processingGraph!)
         CheckError(status)
         
-        status = AUGraphNodeInfo(self.processingGraph, samplerNode, nil, &self.samplerUnit)
+        status = AUGraphNodeInfo(self.processingGraph!, samplerNode, nil, &self.samplerUnit)
         CheckError(status)
         
-        var ioUnit: AudioUnit = nil
-        status = AUGraphNodeInfo(self.processingGraph, ioNode, nil, &ioUnit)
+        var ioUnit: AudioUnit? = nil
+        status = AUGraphNodeInfo(self.processingGraph!, ioNode, nil, &ioUnit)
         CheckError(status)
         
         let ioUnitOutputElement = AudioUnitElement(0)
         let samplerOutputElement = AudioUnitElement(0)
-        status = AUGraphConnectNodeInput(self.processingGraph,
+        status = AUGraphConnectNodeInput(self.processingGraph!,
                                          samplerNode, samplerOutputElement, // srcnode, inSourceOutputNumber
             ioNode, ioUnitOutputElement) // destnode, inDestInputNumber
         CheckError(status)
@@ -918,42 +929,42 @@ class MIDIManager : NSObject {
         
         var status = noErr
         var outIsInitialized:DarwinBoolean = false
-        status = AUGraphIsInitialized(self.processingGraph, &outIsInitialized)
+        status = AUGraphIsInitialized(self.processingGraph!, &outIsInitialized)
         print("isinit status is \(status)")
         print("bool is \(outIsInitialized)")
         if outIsInitialized == false {
-            status = AUGraphInitialize(self.processingGraph)
+            status = AUGraphInitialize(self.processingGraph!)
             CheckError(status)
         }
         
         var isRunning = DarwinBoolean(false)
-        AUGraphIsRunning(self.processingGraph, &isRunning)
+        AUGraphIsRunning(self.processingGraph!, &isRunning)
         print("running bool is \(isRunning)")
         if isRunning == false {
-            status = AUGraphStart(self.processingGraph)
+            status = AUGraphStart(self.processingGraph!)
             CheckError(status)
         }
         
     }
     
-    func playNoteOn(channel:UInt32, noteNum:UInt32, velocity:UInt32)    {
+    func playNoteOn(_ channel:UInt32, noteNum:UInt32, velocity:UInt32)    {
         let noteCommand = UInt32(0x90 | channel)
-        let status = MusicDeviceMIDIEvent(self.samplerUnit, noteCommand, noteNum, velocity, 0)
+        let status = MusicDeviceMIDIEvent(self.samplerUnit!, noteCommand, noteNum, velocity, 0)
         CheckError(status)
     }
     
-    func playNoteOff(channel:UInt32, noteNum:UInt32)    {
+    func playNoteOff(_ channel:UInt32, noteNum:UInt32)    {
         let noteCommand = UInt32(0x80 | channel)
-        let status = MusicDeviceMIDIEvent(self.samplerUnit, noteCommand, noteNum, 0, 0)
+        let status = MusicDeviceMIDIEvent(self.samplerUnit!, noteCommand, noteNum, 0, 0)
         CheckError(status)
     }
     
     
     /// loads preset into self.samplerUnit
-    func loadSF2Preset(preset:UInt8)  {
+    func loadSF2Preset(_ preset:UInt8)  {
         
         // This is the MuseCore soundfont. Change it to the one you have.
-        if let bankURL = NSBundle.mainBundle().URLForResource("GeneralUser GS MuseScore v1.442", withExtension: "sf2") {
+        if let bankURL = Bundle.main().urlForResource("GeneralUser GS MuseScore v1.442", withExtension: "sf2") {
             var instdata = AUSamplerInstrumentData(fileURL: Unmanaged.passUnretained(bankURL),
                                                    instrumentType: UInt8(kInstrumentType_DLSPreset),
                                                    bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
@@ -962,7 +973,7 @@ class MIDIManager : NSObject {
             
             
             let status = AudioUnitSetProperty(
-                self.samplerUnit,
+                self.samplerUnit!,
                 AudioUnitPropertyID(kAUSamplerProperty_LoadInstrument),
                 AudioUnitScope(kAudioUnitScope_Global),
                 0,
@@ -978,7 +989,7 @@ class MIDIManager : NSObject {
      Not as detailed as Adamson's CheckError, but adequate.
      For other projects you can uncomment the Core MIDI constants.
      */
-    func CheckError(error:OSStatus) {
+    func CheckError(_ error:OSStatus) {
         if error == noErr {return}
         
         switch(error) {
